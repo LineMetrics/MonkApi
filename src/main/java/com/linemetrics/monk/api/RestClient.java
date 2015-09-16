@@ -81,7 +81,7 @@ public class RestClient {
         HttpResponse resp = httpClient.execute(req);
 
 //        System.out.println(req);
-//        System.out.println(resp);
+//        System.out.println(resp.getStatusLine());
 //
 //        Header headers[] = req.getAllHeaders();
 //        for(Header h:headers){
@@ -123,7 +123,7 @@ public class RestClient {
         if (sl.getStatusCode() >= 300)
             throw new RestException(sl.getReasonPhrase(), sl.getStatusCode(), result.toString());
 
-        return result.length() > 0 ? (JSONObject)JSONValue.parse(result.toString()) : null;
+        return (JSONObject)JSONValue.parse(! result.toString().isEmpty() ? result.toString() : "{\"data\":[]}");
     }
 
     public JSONObject get(URI uri) throws RestException, IOException {

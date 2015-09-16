@@ -40,6 +40,12 @@ public class DataItem {
         }
     }
 
+    private DataItem() {}
+
+    public static DataItem empty() {
+        return new DataItem();
+    }
+
     private void deserialiseMap(Map map) {
         if (map.containsKey(map.get("max")) &&
                 map.containsKey(map.get("max"))) {

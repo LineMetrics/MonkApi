@@ -28,6 +28,8 @@ import com.linemetrics.monk.api.helper.DataItemComparator;
 import com.linemetrics.monk.dao.DataItem;
 import com.linemetrics.monk.dao.TDB;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
@@ -37,13 +39,25 @@ public class ApiClient {
     public static final String DEFAULT_API_REV = "v1";
     public static String apirev = DEFAULT_API_REV;
 
-    public static int MAX_RETRIES = 3;
-    public static int WAIT_MILLIS_AFTER_ERROR = 500;
+    public static int MAX_RETRIES = 720;
+    public static int WAIT_MILLIS_AFTER_ERROR = 20 * 1000;
+
+    public static int OPERATION_TIME_OUT = 10 * 1000;
+    public static int CONNECTION_TIME_OUT = 10 * 1000;
+    public static int SOCKET_TIME_OUT = 10 * 1000;
+    public static int WAIT_BETWEEN_OPTIMIZE_QUERY = 1 * 1000;
 
     private RestClient restclient = null;
 
     public ApiClient(String uri, ICredentials creds) throws RestException {
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+
+        RequestConfig requestConfig =
+            RequestConfig.custom()
+                .setConnectTimeout(OPERATION_TIME_OUT)
+                .setConnectionRequestTimeout(CONNECTION_TIME_OUT)
+                .setSocketTimeout(SOCKET_TIME_OUT)
+                .build();
+        HttpClient httpclient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 
         restclient = new RestClient(httpclient, creds, URI.create(uri));
 
@@ -225,7 +239,7 @@ public class ApiClient {
                 try {
                     Thread.sleep(WAIT_MILLIS_AFTER_ERROR);
                 } catch(InterruptedException iexp) {
-                    iexp.printStackTrace();
+//                    iexp.printStackTrace();
                 }
             }
 
@@ -254,10 +268,15 @@ public class ApiClient {
                 }
 
             } catch (Exception ex) {
-                System.out.print(" UNABLE "); isError = true;
+                ex.printStackTrace();
+                System.out.print(" UNABLE: " + ex.getMessage()); isError = true;
             } finally {
                 System.out.println(": " + (System.currentTimeMillis() - millis) + "ms ");
             }
+        }
+
+        if(isError) {
+            throw new ApiException("Unable to grab data");
         }
 
         Collections.sort(list, DataItemComparator.getInstance());
@@ -269,7 +288,7 @@ public class ApiClient {
             currItem = itemIterator.next();
 
             if(currItem.getTimestamp() < time_from ||
-                currItem.getTimestamp() >= time_to) {
+                currItem.getTimestamp() > time_to) {
 
                 itemIterator.remove();
             }
@@ -321,9 +340,10 @@ public class ApiClient {
 
         public List<DataItem> call() throws Exception {
             try {
+                Thread.sleep(WAIT_BETWEEN_OPTIMIZE_QUERY);
                 return getRange(dataStreamId, queryStart, queryEnd, tdb, tz);
             } catch (ApiException apiExp) {
-                apiExp.printStackTrace();
+//                apiExp.printStackTrace();
                 return null;
             }
         }
