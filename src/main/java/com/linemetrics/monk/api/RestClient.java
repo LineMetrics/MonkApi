@@ -78,50 +78,52 @@ public class RestClient {
             creds.authenticate(req);
         }
 
-        HttpResponse resp = httpClient.execute(req);
 
-//        System.out.println(req);
-//        System.out.println(resp.getStatusLine());
-//
-//        Header headers[] = req.getAllHeaders();
-//        for(Header h:headers){
-//            System.out.println(h.getName() + ": " + h.getValue());
-//        }
-
-        HttpEntity ent = resp.getEntity();
         StringBuilder result = new StringBuilder();
 
-        if (ent != null) {
-            String encoding = null;
-            if (ent.getContentEncoding() != null) {
-                encoding = ent.getContentEncoding().getValue();
-            }
+        try {
+            HttpResponse resp = httpClient.execute(req);
 
-            if (encoding == null) {
-                Header contentTypeHeader = resp.getFirstHeader("content-type");
-                HeaderElement[] contentTypeElements = contentTypeHeader.getElements();
-                for (HeaderElement he : contentTypeElements) {
-                    NameValuePair nvp = he.getParameterByName("charset");
-                    if (nvp != null) {
-                        encoding = nvp.getValue();
+            HttpEntity ent = resp.getEntity();
+
+            if (ent != null) {
+                String encoding = null;
+                if (ent.getContentEncoding() != null) {
+                    encoding = ent.getContentEncoding().getValue();
+                }
+
+                if (encoding == null) {
+                    Header contentTypeHeader = resp.getFirstHeader("content-type");
+                    HeaderElement[] contentTypeElements = contentTypeHeader.getElements();
+                    for (HeaderElement he : contentTypeElements) {
+                        NameValuePair nvp = he.getParameterByName("charset");
+                        if (nvp != null) {
+                            encoding = nvp.getValue();
+                        }
                     }
                 }
+
+                InputStreamReader isr = encoding != null ?
+                    new InputStreamReader(ent.getContent(), encoding) :
+                    new InputStreamReader(ent.getContent());
+                BufferedReader br = new BufferedReader(isr);
+                String line = "";
+
+                while ((line = br.readLine()) != null)
+                    result.append(line);
             }
 
-            InputStreamReader isr = encoding != null ?
-                new InputStreamReader(ent.getContent(), encoding) :
-                new InputStreamReader(ent.getContent());
-            BufferedReader br = new BufferedReader(isr);
-            String line = "";
+            StatusLine sl = resp.getStatusLine();
 
-            while ((line = br.readLine()) != null)
-                result.append(line);
+            if (sl.getStatusCode() >= 300) {
+                throw new RestException(sl.getReasonPhrase(), sl.getStatusCode(), result.toString());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RestException(e.getMessage(), -1, "");
+        } finally {
+            req.releaseConnection();
         }
-
-        StatusLine sl = resp.getStatusLine();
-
-        if (sl.getStatusCode() >= 300)
-            throw new RestException(sl.getReasonPhrase(), sl.getStatusCode(), result.toString());
 
         return (JSONObject)JSONValue.parse(! result.toString().isEmpty() ? result.toString() : "{\"data\":[]}");
     }

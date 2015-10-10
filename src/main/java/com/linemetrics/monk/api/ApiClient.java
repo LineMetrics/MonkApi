@@ -309,6 +309,7 @@ public class ApiClient {
             JSONObject result = restclient.get(uri, false);
             return new HashBasedToken(this.restclient, result);
         } catch (Exception ex) {
+            System.out.println("Unable to retrieve token!");
             throw new ApiException(
                 "Unable to retrieve auth token: " + ex.getMessage(), ex
             );
