@@ -26,7 +26,7 @@ public class HashBasedCredential
 
     private String hash;
 
-    private ApiClient client;
+    private IApiClient client;
 
     private HashBasedToken token;
 
@@ -34,7 +34,7 @@ public class HashBasedCredential
         this.hash = hash;
     }
 
-    public void initialize(ApiClient client) {
+    public void initialize(IApiClient client) {
         this.client = client;
     }
 

@@ -34,7 +34,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
-public class ApiClient {
+public class ApiClient implements IApiClient {
 
     public static final String DEFAULT_API_REV = "v1";
     public static String apirev = DEFAULT_API_REV;

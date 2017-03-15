@@ -2,13 +2,13 @@ package com.linemetrics.monk.api;
 
 public class ApiManager {
 
-    static ApiClient apiClient;
+    static IApiClient apiClient;
 
-    public static void setClient(ApiClient api) {
+    public static void setClient(IApiClient api) {
         ApiManager.apiClient = api;
     }
 
-    public static ApiClient getClient() {
+    public static IApiClient getClient() {
         return ApiManager.apiClient;
     }
 

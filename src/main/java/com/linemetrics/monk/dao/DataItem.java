@@ -40,6 +40,13 @@ public class DataItem {
         }
     }
 
+    public DataItem(Double min, Double max, Double value, Long timestampStart){
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.timestampStart = timestampStart;
+    }
+
     private DataItem() {}
 
     public static DataItem empty() {
