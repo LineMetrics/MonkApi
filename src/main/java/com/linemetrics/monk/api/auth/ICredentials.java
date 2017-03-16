@@ -18,7 +18,6 @@
 
 package com.linemetrics.monk.api.auth;
 
-import com.linemetrics.monk.api.ApiClient;
 import com.linemetrics.monk.api.IApiClient;
 import com.linemetrics.monk.api.RestException;
 import org.apache.http.HttpRequest;

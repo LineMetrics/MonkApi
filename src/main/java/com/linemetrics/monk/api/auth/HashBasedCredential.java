@@ -18,7 +18,8 @@
 
 package com.linemetrics.monk.api.auth;
 
-import com.linemetrics.monk.api.*;
+import com.linemetrics.monk.api.ApiException;
+import com.linemetrics.monk.api.IApiClient;
 import org.apache.http.HttpRequest;
 
 public class HashBasedCredential

@@ -18,8 +18,8 @@
 
 package com.linemetrics.monk.api.auth;
 
-import com.linemetrics.monk.api.Util;
 import com.linemetrics.monk.api.RestClient;
+import com.linemetrics.monk.api.Util;
 import org.json.simple.JSONObject;
 
 import java.util.Map;

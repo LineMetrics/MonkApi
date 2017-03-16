@@ -3,10 +3,7 @@ package com.linemetrics.monk.api;
 import com.linemetrics.monk.api.auth.HashBasedToken;
 import com.linemetrics.monk.dao.DataItem;
 import com.linemetrics.monk.dao.TDB;
-import org.json.simple.JSONObject;
 
-import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -15,8 +12,10 @@ import java.util.TimeZone;
  */
 public interface IApiClient {
 
+    public void setJobProperties(String properties);
+
     public List<DataItem> getRangeOptimized(
-            final Number dataStreamId,
+            final String dataStreamProperties,
             long time_from,
             long time_to,
             TDB tdb,

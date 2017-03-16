@@ -18,21 +18,20 @@
 
 package com.linemetrics.monk.api;
 
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.*;
-
 import com.linemetrics.monk.api.auth.HashBasedToken;
 import com.linemetrics.monk.api.auth.ICredentials;
 import com.linemetrics.monk.api.helper.DataItemComparator;
 import com.linemetrics.monk.dao.DataItem;
 import com.linemetrics.monk.dao.TDB;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class ApiClient implements IApiClient {
 
@@ -47,6 +46,8 @@ public class ApiClient implements IApiClient {
     public static int SOCKET_TIME_OUT = 10 * 1000;
     public static int WAIT_BETWEEN_OPTIMIZE_QUERY = 1 * 1000;
 
+
+    private JSONObject jobProperties;
     private RestClient restclient = null;
 
     public ApiClient(String uri, ICredentials creds) throws RestException {
@@ -103,13 +104,20 @@ public class ApiClient implements IApiClient {
         return null;
     }
 
+    @Override
+    public void setJobProperties(String properties) {
+        this.jobProperties = (JSONObject) JSONValue.parse(properties);
+    }
+
     public List<DataItem> getRangeOptimized(
-            final Number dataStreamId,
+            final String dataStreamProperties,
             long time_from,
             long time_to,
             TDB tdb,
             TimeZone tz)
         throws ApiException {
+
+        JSONObject datastream = (JSONObject)JSONValue.parse(dataStreamProperties);
 
         try {
             long timeDiff     = time_to - time_from;
@@ -117,7 +125,7 @@ public class ApiClient implements IApiClient {
             long queryRange   = tdb.getQueryRange();
 
             if(timeDiff < maxTimeRange) {
-                return this.getRange(dataStreamId, time_from, time_to, tdb, tz);
+                return this.getRange(datastream.containsKey("id")?Integer.valueOf((String)datastream.get("id")):null, time_from, time_to, tdb, tz);
             }
 
             long millis = System.currentTimeMillis();
@@ -134,11 +142,11 @@ public class ApiClient implements IApiClient {
                 callables.add(
                     executorService.submit(
                         new CallableRangeQuery(
-                        dataStreamId,
-                        queryStart,
-                        queryEnd,
-                        tdb,
-                        tz)
+                                datastream.containsKey("id")?Integer.valueOf((String)datastream.get("id")):null,
+                                queryStart,
+                                queryEnd,
+                                tdb,
+                                tz)
                     ));
 
                 queryStart += queryRange;
@@ -306,6 +314,7 @@ public class ApiClient implements IApiClient {
                 new HashMap<String, String>() {{
                     put("basic", hash);
                 }});
+
             JSONObject result = restclient.get(uri, false);
             return new HashBasedToken(this.restclient, result);
         } catch (Exception ex) {
