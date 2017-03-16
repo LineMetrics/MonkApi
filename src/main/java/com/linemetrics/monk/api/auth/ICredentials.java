@@ -18,13 +18,13 @@
 
 package com.linemetrics.monk.api.auth;
 
-import com.linemetrics.monk.api.ApiClient;
+import com.linemetrics.monk.api.IApiClient;
 import com.linemetrics.monk.api.RestException;
 import org.apache.http.HttpRequest;
 
 public interface ICredentials {
 
-    void initialize(ApiClient client) throws RestException;
+    void initialize(IApiClient client) throws RestException;
 
     /**
      * Sets the Authorization header for the given request.

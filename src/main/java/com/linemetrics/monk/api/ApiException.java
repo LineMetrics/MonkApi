@@ -18,8 +18,6 @@
 
 package com.linemetrics.monk.api;
 
-import java.lang.Throwable;
-
 /**
  * A generic LineMetrics API exception.
  */

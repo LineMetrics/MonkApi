@@ -40,6 +40,21 @@ public class DataItem {
         }
     }
 
+    public DataItem(Double min, Double max, Double value, Long timestampStart){
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.timestampStart = timestampStart;
+    }
+
+    public DataItem(Double min, Double max, Double value, Long timestampStart, Long timestampEnd){
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.timestampStart = timestampStart;
+        this.timestampEnd = timestampEnd;
+    }
+
     private DataItem() {}
 
     public static DataItem empty() {

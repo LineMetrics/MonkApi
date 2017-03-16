@@ -18,7 +18,8 @@
 
 package com.linemetrics.monk.api.auth;
 
-import com.linemetrics.monk.api.*;
+import com.linemetrics.monk.api.ApiException;
+import com.linemetrics.monk.api.IApiClient;
 import org.apache.http.HttpRequest;
 
 public class HashBasedCredential
@@ -26,7 +27,7 @@ public class HashBasedCredential
 
     private String hash;
 
-    private ApiClient client;
+    private IApiClient client;
 
     private HashBasedToken token;
 
@@ -34,7 +35,7 @@ public class HashBasedCredential
         this.hash = hash;
     }
 
-    public void initialize(ApiClient client) {
+    public void initialize(IApiClient client) {
         this.client = client;
     }
 
